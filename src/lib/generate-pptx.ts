@@ -267,7 +267,7 @@ async function loadAsset(path: string): Promise<string | null> {
 
 function addSlideChrome(slide: pptxgen.Slide, logo: string | null, bg: string | null) {
   if (bg) {
-    slide.addImage({ data: bg, x: 0, y: 0, w: 7.5, h: 5.625, sizing: { type: "cover", w: 7.5, h: 5.625 } });
+    slide.addImage({ data: bg, x: 0, y: 0, w: 10, h: 5.625, sizing: { type: "cover", w: 10, h: 5.625 } });
   }
   if (logo) {
     slide.addImage({ data: logo, x: 0.4, y: 0.3, w: 0.45, h: 0.45 });
@@ -280,12 +280,12 @@ function addSlideChrome(slide: pptxgen.Slide, logo: string | null, bg: string | 
 
 function addContentTitle(slide: pptxgen.Slide, title: string, periodo?: string) {
   slide.addText(title, {
-    x: 0.4, y: 0.85, w: 7.5, h: 0.5,
+    x: 0.4, y: 0.85, w: 9.2, h: 0.5,
     fontFace: FONT_HEADING, fontSize: 22, bold: true, color: COLORS.primary,
   });
   if (periodo) {
     slide.addText(`Período: ${periodo}`, {
-      x: 7.3, y: 0.9, w: 2.4, h: 0.35,
+      x: 8.2, y: 0.9, w: 1.6, h: 0.35,
       fontFace: FONT_BODY, fontSize: 10, color: COLORS.textMuted, align: "right",
     });
   }
@@ -346,44 +346,45 @@ function addSideNote(
 function addCoverSlide(pptx: pptxgen, data: PresentationData, coverBg: string | null, logo: string | null) {
   const slide = pptx.addSlide();
 
-  // Fundo 100% do slide — sem borda branca em nenhuma direção
+  // Fundo escuro esquerda (imagem ou cor sólida)
   if (coverBg) {
-    slide.addImage({ data: coverBg, x: 0, y: 0, w: 7.5, h: 5.625, sizing: { type: "cover", w: 7.5, h: 5.625 } });
+    slide.addImage({ data: coverBg, x: 0, y: 0, w: 10, h: 5.625, sizing: { type: "cover", w: 10, h: 5.625 } });
   } else {
     slide.background = { color: COLORS.primary };
   }
 
-  // Overlay escuro para legibilidade (igual ao modelo)
+  // Painel branco direita — igual ao modelo (começa em x=5.0")
   slide.addShape("rect", {
-    x: 0, y: 0, w: 7.5, h: 5.625,
-    fill: { color: "000000", transparency: 33.75 },
+    x: 5.0, y: -0.07, w: 5.04, h: 5.76,
+    fill: { color: COLORS.white },
     line: { type: "none" },
   });
 
   // Logo no topo esquerdo
-  if (logo) slide.addImage({ data: logo, x: 0.45, y: 0.28, w: 0.5, h: 0.5 });
+  if (logo) slide.addImage({ data: logo, x: 0.45, y: 0.28, w: 0.45, h: 0.45 });
   slide.addText("branddi", {
-    x: 1.0, y: 0.3, w: 2, h: 0.38,
-    fontFace: FONT_HEADING, fontSize: 14, bold: true, color: COLORS.white,
+    x: 1.0, y: 0.3, w: 2.5, h: 0.38,
+    fontFace: FONT_HEADING, fontSize: 13, bold: true, color: COLORS.white,
   });
 
-  // "Status Mensal" — Archivo SemiBold grande
+  // "Status Mensal" — lado esquerdo, Archivo SemiBold grande
   slide.addText("Status Mensal", {
-    x: 0.45, y: 1.7, w: 6, h: 0.75,
-    fontFace: FONT_HEADING, fontSize: 36, bold: true, color: COLORS.white,
+    x: 0.45, y: 2.05, w: 4.3, h: 0.72,
+    fontFace: FONT_HEADING, fontSize: 36, bold: false, color: COLORS.white,
   });
 
-  // Mês/ano — Inter Light
+  // Mês/Ano — Inter Light, logo abaixo
   slide.addText(data.monthYear, {
-    x: 0.45, y: 2.5, w: 6, h: 0.4,
-    fontFace: FONT_BODY, fontSize: 15, bold: false, color: COLORS.white,
+    x: 0.45, y: 2.82, w: 4.3, h: 0.45,
+    fontFace: FONT_BODY, fontSize: 16, bold: false, color: COLORS.white,
   });
 
-  // Nome do cliente — Archivo, lado direito
+  // Nome do cliente — painel branco direito, centralizado verticalmente
   slide.addText(data.clientName.toUpperCase(), {
-    x: 5.8, y: 1.7, w: 3.9, h: 1.5,
-    fontFace: FONT_HEADING, fontSize: 26, bold: true, color: COLORS.white,
-    align: "right", valign: "bottom",
+    x: 5.1, y: 1.8, w: 4.7, h: 2.0,
+    fontFace: FONT_HEADING, fontSize: 28, bold: true, color: COLORS.primary,
+    align: "center", valign: "middle",
+    wrap: true,
   });
 }
 
@@ -394,42 +395,25 @@ function addDividerSlide(pptx: pptxgen, title: string, coverBg: string | null, l
 
   // Fundo 100% — sem borda branca
   if (coverBg) {
-    slide.addImage({ data: coverBg, x: 0, y: 0, w: 7.5, h: 5.625, sizing: { type: "cover", w: 7.5, h: 5.625 } });
+    slide.addImage({ data: coverBg, x: 0, y: 0, w: 10, h: 5.625, sizing: { type: "cover", w: 10, h: 5.625 } });
   } else {
     slide.background = { color: COLORS.primary };
   }
 
-  // Overlay escuro
-  slide.addShape("rect", {
-    x: 0, y: 0, w: 7.5, h: 5.625,
-    fill: { color: "000000", transparency: 33.75 },
-    line: { type: "none" },
-  });
-
-  // Logo no topo
-  if (logo) slide.addImage({ data: logo, x: 0.45, y: 0.28, w: 0.5, h: 0.5 });
+  // Logo no topo esquerdo
+  if (logo) slide.addImage({ data: logo, x: 0.45, y: 0.28, w: 0.45, h: 0.45 });
   slide.addText("branddi", {
-    x: 1.0, y: 0.3, w: 2, h: 0.38,
-    fontFace: FONT_HEADING, fontSize: 14, bold: true, color: COLORS.white,
+    x: 1.0, y: 0.3, w: 2.5, h: 0.38,
+    fontFace: FONT_HEADING, fontSize: 13, bold: true, color: COLORS.white,
   });
 
-  // Título dividido em 2 linhas — Archivo bold grande (igual ao modelo: "Brand" / "Bidding")
-  const parts = title.split(" ");
-  if (parts.length >= 2) {
-    slide.addText(parts[0], {
-      x: 0.45, y: 1.5, w: 8, h: 1.1,
-      fontFace: FONT_HEADING, fontSize: 56, bold: true, color: COLORS.white,
-    });
-    slide.addText(parts.slice(1).join(" "), {
-      x: 0.45, y: 2.6, w: 8, h: 1.1,
-      fontFace: FONT_HEADING, fontSize: 56, bold: true, color: COLORS.white,
-    });
-  } else {
-    slide.addText(title, {
-      x: 0.45, y: 2.0, w: 9, h: 1.5,
-      fontFace: FONT_HEADING, fontSize: 52, bold: true, color: COLORS.white,
-    });
-  }
+  // Título centralizado vertical e horizontalmente — Archivo bold grande
+  slide.addText(title, {
+    x: 0.45, y: 1.6, w: 9.1, h: 2.4,
+    fontFace: FONT_HEADING, fontSize: 56, bold: true, color: COLORS.white,
+    align: "left", valign: "middle",
+    wrap: true,
+  });
 }
 
 // ─── SLIDE 3 - Big Numbers (Toda parceria) ───────────────────────────────────
@@ -472,11 +456,11 @@ function addBigNumbersTotalSlide(
 
   // Taxa de sucesso (lado direito)
   slide.addText(`${taxa}%`, {
-    x: 7.5, y: 2.0, w: 5.5, h: 2.5,
+    x: 7.5, y: 2.0, w: 2.1, h: 2.5,
     fontFace: FONT_HEADING, fontSize: 110, bold: true, color: COLORS.cyan, align: "center",
   });
   slide.addText("de sucesso em Takedowns", {
-    x: 7.5, y: 4.6, w: 5.5, h: 0.5,
+    x: 7.5, y: 4.6, w: 2.1, h: 0.5,
     fontFace: FONT_BODY, fontSize: 14, color: COLORS.textDark, align: "center",
   });
 
@@ -766,7 +750,7 @@ function addAnaliseBingSlide(pptx: pptxgen, data: PresentationData, logo: string
     fontFace: FONT_HEADING, fontSize: 22, bold: true, color: "0078D4",
   });
   slide.addText("Período: Últimos 30 dias", {
-    x: 9.0, y: 1.1, w: 4, h: 0.35,
+    x: 7.0, y: 1.1, w: 2.8, h: 0.35,
     fontFace: FONT_BODY, fontSize: 11, color: COLORS.textMuted, align: "right",
     bold: true,
   });
@@ -819,7 +803,7 @@ function addBingShareSlide(pptx: pptxgen, data: PresentationData, logo: string |
     fontFace: FONT_HEADING, fontSize: 18, bold: true, color: "0078D4",
   });
   slide.addText("Período: Últimos 30 dias", {
-    x: 9.0, y: 1.2, w: 4, h: 0.35,
+    x: 7.0, y: 1.2, w: 2.8, h: 0.35,
     fontFace: FONT_BODY, fontSize: 11, color: COLORS.textMuted, align: "right",
     bold: true,
   });
@@ -861,7 +845,7 @@ function addShareConcorrentesSlide(pptx: pptxgen, data: PresentationData, logo: 
       rectRadius: 0.06,
     });
     slide.addText(data.concorrentesAnalysis, {
-      x: 0.55, y: 5.175, w: 7.5, h: 0.35,
+      x: 0.55, y: 5.175, w: 9.0, h: 0.35,
       fontFace: FONT_BODY, fontSize: 9, color: COLORS.textDark,
     });
   }
@@ -901,7 +885,7 @@ function addShareWhitelistSlide(pptx: pptxgen, data: PresentationData, logo: str
       rectRadius: 0.06,
     });
     slide.addText(data.whitelistAnalysis, {
-      x: 0.55, y: 5.175, w: 7.5, h: 0.35,
+      x: 0.55, y: 5.175, w: 9.0, h: 0.35,
       fontFace: FONT_BODY, fontSize: 9, color: COLORS.textDark,
     });
   }
@@ -999,7 +983,7 @@ function addTrademarkAprovSlide(pptx: pptxgen, data: PresentationData, logo: str
   addSlideChrome(slide, logo, bg);
   addContentTitle(slide, "Uso Indevido de Trademark em Anúncios");
   slide.addText("Aguardando aprovação", {
-    x: 9.0, y: 0.92, w: 4, h: 0.4,
+    x: 7.2, y: 0.92, w: 2.6, h: 0.4,
     fontFace: FONT_BODY, fontSize: 11, color: COLORS.textMuted, align: "right",
   });
 
@@ -1185,7 +1169,7 @@ function addTratativasSlide(pptx: pptxgen, data: PresentationData, logo: string 
   addSlideChrome(slide, logo, bg);
   addContentTitle(slide, "Tratativas em Andamento");
   slide.addText("Agressores: Principais", {
-    x: 9.0, y: 0.92, w: 4, h: 0.4,
+    x: 7.2, y: 0.92, w: 2.6, h: 0.4,
     fontFace: FONT_BODY, fontSize: 11, color: COLORS.textMuted, align: "right",
   });
 
@@ -1324,7 +1308,7 @@ function addNegativacoesSlide(pptx: pptxgen, data: PresentationData, logo: strin
   addSlideChrome(slide, logo, bg);
   addContentTitle(slide, "Negativações confirmadas");
   slide.addText("Agressores: Principais", {
-    x: 9.0, y: 0.92, w: 4, h: 0.4,
+    x: 7.2, y: 0.92, w: 2.6, h: 0.4,
     fontFace: FONT_BODY, fontSize: 11, color: COLORS.textMuted, align: "right",
   });
 
@@ -1417,7 +1401,7 @@ function addCampanhaSlide(
   addContentTitle(slide, title);
   if (slideData.inicioAtuacao) {
     slide.addText(`Início da Atuação: ${slideData.inicioAtuacao}`, {
-      x: 9.0, y: 0.92, w: 4, h: 0.4,
+      x: 7.2, y: 0.92, w: 2.6, h: 0.4,
       fontFace: FONT_BODY, fontSize: 11, color: COLORS.textMuted, align: "right",
     });
   }
@@ -1454,7 +1438,7 @@ function addSavingSlide(pptx: pptxgen, data: PresentationData, logo: string | nu
   addContentTitle(slideIs, "Análise de Saving");
   if (data.saving.inicioAtuacao) {
     slideIs.addText(`Início da Atuação: ${data.saving.inicioAtuacao}`, {
-      x: 9.0, y: 0.92, w: 4, h: 0.4,
+      x: 7.2, y: 0.92, w: 2.6, h: 0.4,
       fontFace: FONT_BODY, fontSize: 11, color: COLORS.textMuted, align: "right",
     });
   }
@@ -1511,7 +1495,7 @@ function addSavingSlide(pptx: pptxgen, data: PresentationData, logo: string | nu
   addContentTitle(slideContains, "Análise de Saving");
   if (data.saving.inicioAtuacao) {
     slideContains.addText(`Início da Atuação: ${data.saving.inicioAtuacao}`, {
-      x: 9.0, y: 0.92, w: 4, h: 0.4,
+      x: 7.2, y: 0.92, w: 2.6, h: 0.4,
       fontFace: FONT_BODY, fontSize: 11, color: COLORS.textMuted, align: "right",
     });
   }
@@ -1590,23 +1574,16 @@ function addEncerramentoSlide(pptx: pptxgen, coverBg: string | null, logo: strin
 
   // Fundo 100% — sem borda branca
   if (coverBg) {
-    slide.addImage({ data: coverBg, x: 0, y: 0, w: 7.5, h: 5.625, sizing: { type: "cover", w: 7.5, h: 5.625 } });
+    slide.addImage({ data: coverBg, x: 0, y: 0, w: 10, h: 5.625, sizing: { type: "cover", w: 10, h: 5.625 } });
   } else {
     slide.background = { color: COLORS.primary };
   }
 
-  // Overlay escuro
-  slide.addShape("rect", {
-    x: 0, y: 0, w: 7.5, h: 5.625,
-    fill: { color: "000000", transparency: 33.75 },
-    line: { type: "none" },
-  });
-
   // Logo topo
-  if (logo) slide.addImage({ data: logo, x: 0.45, y: 0.28, w: 0.5, h: 0.5 });
+  if (logo) slide.addImage({ data: logo, x: 0.45, y: 0.28, w: 0.45, h: 0.45 });
   slide.addText("branddi", {
-    x: 1.0, y: 0.3, w: 2, h: 0.38,
-    fontFace: FONT_HEADING, fontSize: 14, bold: true, color: COLORS.white,
+    x: 1.0, y: 0.3, w: 2.5, h: 0.38,
+    fontFace: FONT_HEADING, fontSize: 13, bold: true, color: COLORS.white,
   });
 
   // Frase principal — Archivo Light + SemiBold (igual ao modelo)
@@ -1674,7 +1651,7 @@ export async function generatePresentationPpt(data: PresentationData, ativos?: P
 
   const pptx = new pptxgen();
   // Layout igual ao modelo original: 10" × 5.625" (widescreen 16:9)
-  pptx.defineLayout({ name: "BRANDDI_16_9", width: 7.5, height: 5.625 });
+  pptx.defineLayout({ name: "BRANDDI_16_9", width: 10, height: 5.625 });
   pptx.layout = "BRANDDI_16_9";
   const W = 10;      // largura do slide
   const H = 5.625;   // altura do slide
