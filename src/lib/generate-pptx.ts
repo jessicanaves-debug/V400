@@ -218,8 +218,8 @@ const COLORS = {
   blueAccent: "1A6CB0",        // Detalhes em azul nos gráficos (sidenotes)
 };
 
-const FONT_HEADING = "Calibri";
-const FONT_BODY = "Calibri";
+const FONT_HEADING = "Archivo";
+const FONT_BODY = "Inter";
 
 // ─── Constantes da apresentação ───────────────────────────────────────────────
 
@@ -267,7 +267,7 @@ async function loadAsset(path: string): Promise<string | null> {
 
 function addSlideChrome(slide: pptxgen.Slide, logo: string | null, bg: string | null) {
   if (bg) {
-    slide.addImage({ data: bg, x: 0, y: 0, w: 13.333, h: 7.5, sizing: { type: "cover", w: 13.333, h: 7.5 } });
+    slide.addImage({ data: bg, x: 0, y: 0, w: 7.5, h: 5.625, sizing: { type: "cover", w: 7.5, h: 5.625 } });
   }
   if (logo) {
     slide.addImage({ data: logo, x: 0.4, y: 0.3, w: 0.45, h: 0.45 });
@@ -280,13 +280,13 @@ function addSlideChrome(slide: pptxgen.Slide, logo: string | null, bg: string | 
 
 function addContentTitle(slide: pptxgen.Slide, title: string, periodo?: string) {
   slide.addText(title, {
-    x: 0.4, y: 0.85, w: 8, h: 0.5,
+    x: 0.4, y: 0.85, w: 7.5, h: 0.5,
     fontFace: FONT_HEADING, fontSize: 22, bold: true, color: COLORS.primary,
   });
   if (periodo) {
     slide.addText(`Período: ${periodo}`, {
-      x: 9.0, y: 0.92, w: 4, h: 0.4,
-      fontFace: FONT_BODY, fontSize: 11, color: COLORS.textMuted, align: "right",
+      x: 7.3, y: 0.9, w: 2.4, h: 0.35,
+      fontFace: FONT_BODY, fontSize: 10, color: COLORS.textMuted, align: "right",
     });
   }
 }
@@ -346,37 +346,44 @@ function addSideNote(
 function addCoverSlide(pptx: pptxgen, data: PresentationData, coverBg: string | null, logo: string | null) {
   const slide = pptx.addSlide();
 
+  // Fundo 100% do slide — sem borda branca em nenhuma direção
   if (coverBg) {
-    slide.addImage({ data: coverBg, x: 0, y: 0, w: 13.333, h: 7.5, sizing: { type: "cover", w: 13.333, h: 7.5 } });
+    slide.addImage({ data: coverBg, x: 0, y: 0, w: 7.5, h: 5.625, sizing: { type: "cover", w: 7.5, h: 5.625 } });
   } else {
     slide.background = { color: COLORS.primary };
   }
 
-  // Lado direito branco
+  // Overlay escuro para legibilidade (igual ao modelo)
   slide.addShape("rect", {
-    x: 7.5, y: 0, w: 5.833, h: 7.5,
-    fill: { color: COLORS.white }, line: { type: "none" },
+    x: 0, y: 0, w: 7.5, h: 5.625,
+    fill: { color: "000000", transparency: 33.75 },
+    line: { type: "none" },
   });
 
-  if (logo) slide.addImage({ data: logo, x: 0.5, y: 0.4, w: 0.5, h: 0.5 });
+  // Logo no topo esquerdo
+  if (logo) slide.addImage({ data: logo, x: 0.45, y: 0.28, w: 0.5, h: 0.5 });
   slide.addText("branddi", {
-    x: 1.05, y: 0.42, w: 1.5, h: 0.4,
-    fontFace: FONT_HEADING, fontSize: 16, bold: true, color: COLORS.white,
+    x: 1.0, y: 0.3, w: 2, h: 0.38,
+    fontFace: FONT_HEADING, fontSize: 14, bold: true, color: COLORS.white,
   });
 
+  // "Status Mensal" — Archivo SemiBold grande
   slide.addText("Status Mensal", {
-    x: 0.6, y: 3.0, w: 7, h: 0.8,
-    fontFace: FONT_HEADING, fontSize: 40, bold: true, color: COLORS.white,
-  });
-  slide.addText(data.monthYear, {
-    x: 0.6, y: 3.9, w: 7, h: 0.5,
-    fontFace: FONT_BODY, fontSize: 18, color: COLORS.cyanLight,
+    x: 0.45, y: 1.7, w: 6, h: 0.75,
+    fontFace: FONT_HEADING, fontSize: 36, bold: true, color: COLORS.white,
   });
 
+  // Mês/ano — Inter Light
+  slide.addText(data.monthYear, {
+    x: 0.45, y: 2.5, w: 6, h: 0.4,
+    fontFace: FONT_BODY, fontSize: 15, bold: false, color: COLORS.white,
+  });
+
+  // Nome do cliente — Archivo, lado direito
   slide.addText(data.clientName.toUpperCase(), {
-    x: 7.7, y: 3.0, w: 5.4, h: 1.5,
-    fontFace: FONT_HEADING, fontSize: 36, bold: true, color: COLORS.primary,
-    align: "center", valign: "middle",
+    x: 5.8, y: 1.7, w: 3.9, h: 1.5,
+    fontFace: FONT_HEADING, fontSize: 26, bold: true, color: COLORS.white,
+    align: "right", valign: "bottom",
   });
 }
 
@@ -384,32 +391,43 @@ function addCoverSlide(pptx: pptxgen, data: PresentationData, coverBg: string | 
 
 function addDividerSlide(pptx: pptxgen, title: string, coverBg: string | null, logo: string | null) {
   const slide = pptx.addSlide();
+
+  // Fundo 100% — sem borda branca
   if (coverBg) {
-    slide.addImage({ data: coverBg, x: 0, y: 0, w: 13.333, h: 7.5, sizing: { type: "cover", w: 13.333, h: 7.5 } });
+    slide.addImage({ data: coverBg, x: 0, y: 0, w: 7.5, h: 5.625, sizing: { type: "cover", w: 7.5, h: 5.625 } });
   } else {
     slide.background = { color: COLORS.primary };
   }
-  if (logo) slide.addImage({ data: logo, x: 0.5, y: 0.4, w: 0.5, h: 0.5 });
-  slide.addText("branddi", {
-    x: 1.05, y: 0.42, w: 1.5, h: 0.4,
-    fontFace: FONT_HEADING, fontSize: 16, bold: true, color: COLORS.white,
+
+  // Overlay escuro
+  slide.addShape("rect", {
+    x: 0, y: 0, w: 7.5, h: 5.625,
+    fill: { color: "000000", transparency: 33.75 },
+    line: { type: "none" },
   });
 
-  // Quebra título em duas linhas
+  // Logo no topo
+  if (logo) slide.addImage({ data: logo, x: 0.45, y: 0.28, w: 0.5, h: 0.5 });
+  slide.addText("branddi", {
+    x: 1.0, y: 0.3, w: 2, h: 0.38,
+    fontFace: FONT_HEADING, fontSize: 14, bold: true, color: COLORS.white,
+  });
+
+  // Título dividido em 2 linhas — Archivo bold grande (igual ao modelo: "Brand" / "Bidding")
   const parts = title.split(" ");
-  if (parts.length === 2) {
+  if (parts.length >= 2) {
     slide.addText(parts[0], {
-      x: 1.5, y: 2.7, w: 7, h: 1.2,
-      fontFace: FONT_HEADING, fontSize: 60, bold: true, color: COLORS.white,
+      x: 0.45, y: 1.5, w: 8, h: 1.1,
+      fontFace: FONT_HEADING, fontSize: 56, bold: true, color: COLORS.white,
     });
-    slide.addText(parts[1], {
-      x: 1.5, y: 3.9, w: 7, h: 1.2,
-      fontFace: FONT_HEADING, fontSize: 60, bold: true, color: COLORS.white,
+    slide.addText(parts.slice(1).join(" "), {
+      x: 0.45, y: 2.6, w: 8, h: 1.1,
+      fontFace: FONT_HEADING, fontSize: 56, bold: true, color: COLORS.white,
     });
   } else {
     slide.addText(title, {
-      x: 1.5, y: 3.0, w: 10, h: 1.5,
-      fontFace: FONT_HEADING, fontSize: 56, bold: true, color: COLORS.white,
+      x: 0.45, y: 2.0, w: 9, h: 1.5,
+      fontFace: FONT_HEADING, fontSize: 52, bold: true, color: COLORS.white,
     });
   }
 }
@@ -465,14 +483,14 @@ function addBigNumbersTotalSlide(
   // Economia
   if (data.economiaTotal) {
     slide.addText(`*Economia total de R${parseFloat(data.economiaTotal.replace(/[^0-9.,]/g,"").replace(",",".")).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})} em notificações enviadas.`, {
-      x: 0.4, y: 5.6, w: 7, h: 0.4,
+      x: 0.4, y: 4.2, w: 7, h: 0.4,
       fontFace: FONT_BODY, fontSize: 10, color: COLORS.textMuted, italic: true,
     });
   }
 
   if (data.bigNumbersTotalAnalysis) {
     slide.addText(data.bigNumbersTotalAnalysis, {
-      x: 0.4, y: 6.3, w: 12.5, h: 0.9,
+      x: 0.4, y: 4.725, w: 9.375, h: 0.9,
       fontFace: FONT_BODY, fontSize: 11, color: COLORS.textMuted, italic: true,
     });
   }
@@ -563,17 +581,17 @@ function addBigNumbersDuploSlide(
   })();
 
   slide.addText(tx, {
-    x: 10.6, y: 4.8, w: 2, h: 0.7,
+    x: 7.95, y: 4.8, w: 2, h: 0.7,
     fontFace: FONT_HEADING, fontSize: 32, bold: true, color: COLORS.cyan, align: "center",
   });
   slide.addText("Taxa de Sucesso", {
-    x: 10.6, y: 5.5, w: 2, h: 0.4,
+    x: 7.95, y: 4.125, w: 2, h: 0.4,
     fontFace: FONT_BODY, fontSize: 9, color: COLORS.textMuted, align: "center",
   });
 
   if (data.economiaMes) {
     slide.addText(`*Economia total de R${parseFloat(data.economiaMes.replace(/[^0-9.,]/g,"").replace(",",".")).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})} em notificações enviadas.`, {
-      x: 6.8, y: 6.5, w: 6.5, h: 0.4,
+      x: 6.8, y: 4.875, w: 6.5, h: 0.4,
       fontFace: FONT_BODY, fontSize: 9, color: COLORS.textMuted, italic: true,
     });
   }
@@ -588,7 +606,7 @@ function addBranddiScoreSlide(pptx: pptxgen, data: PresentationData, logo: strin
 
   slide.addText(
     "O Branddi Score mede a blindagem de sua marca a partir da agressividade total dos agressores capturados.",
-    { x: 0.4, y: 1.4, w: 12.5, h: 0.5, fontFace: FONT_BODY, fontSize: 12, color: COLORS.textDark }
+    { x: 0.4, y: 1.4, w: 9.375, h: 0.5, fontFace: FONT_BODY, fontSize: 12, color: COLORS.textDark }
   );
 
   // Gráfico centralizado, largura total
@@ -601,7 +619,7 @@ function addBranddiScoreSlide(pptx: pptxgen, data: PresentationData, logo: strin
 
   if (data.branddiScoreAnalysis) {
     slide.addText(data.branddiScoreAnalysis, {
-      x: 0.4, y: 6.65, w: 12.5, h: 0.7,
+      x: 0.4, y: 4.988, w: 9.375, h: 0.7,
       fontFace: FONT_BODY, fontSize: 11, color: COLORS.textMuted, italic: true,
     });
   }
@@ -625,7 +643,7 @@ function addAgressoresSlide(
   // Análise ACIMA do gráfico
   if (analysis) {
     slide.addText(analysis, {
-      x: 0.4, y: 1.35, w: 12.5, h: 0.55,
+      x: 0.4, y: 1.35, w: 9.375, h: 0.55,
       fontFace: FONT_BODY, fontSize: 12, color: COLORS.textDark,
     });
   }
@@ -676,7 +694,7 @@ function addAnaliseTermosSlide(
   // Análise COMPARATIVA (única, embaixo - largura total)
   if (analysisTxt) {
     slide.addText(analysisTxt, {
-      x: 0.4, y: 6.1, w: 12.5, h: 1.2,
+      x: 0.4, y: 4.575, w: 9.375, h: 1.2,
       fontFace: FONT_BODY, fontSize: 10, color: COLORS.textDark, italic: true, align: "center",
     });
   }
@@ -709,13 +727,13 @@ function addShareSlide(
   // Análises EMBAIXO do gráfico (igual ao modelo) - 2 linhas em azul
   if (analysis) {
     slide.addText(`📌 ${analysis}`, {
-      x: 0.6, y: 6.0, w: 12.1, h: 0.5,
+      x: 0.6, y: 4.5, w: 9.075, h: 0.5,
       fontFace: FONT_BODY, fontSize: 11, color: COLORS.blueAccent, italic: true,
     });
   }
   if (analysis2) {
     slide.addText(`📌 ${analysis2}`, {
-      x: 0.6, y: 6.6, w: 12.1, h: 0.5,
+      x: 0.6, y: 4.95, w: 9.075, h: 0.5,
       fontFace: FONT_BODY, fontSize: 11, color: COLORS.blueAccent, italic: true,
     });
   }
@@ -744,7 +762,7 @@ function addAnaliseBingSlide(pptx: pptxgen, data: PresentationData, logo: string
     fontFace: FONT_HEADING, fontSize: 22, bold: true, color: COLORS.primary,
   });
   slide.addText("Bing", {
-    x: 10.5, y: 0.6, w: 2.5, h: 0.5,
+    x: 7.875, y: 0.6, w: 2.5, h: 0.5,
     fontFace: FONT_HEADING, fontSize: 22, bold: true, color: "0078D4",
   });
   slide.addText("Período: Últimos 30 dias", {
@@ -762,24 +780,24 @@ function addAnaliseBingSlide(pptx: pptxgen, data: PresentationData, logo: string
   // Análises embaixo lado a lado
   if (data.bingAnalysisPlataforma) {
     slide.addShape("roundRect", {
-      x: 0.4, y: 5.95, w: 6.1, h: 1.3,
+      x: 0.4, y: 4.463, w: 6.1, h: 1.3,
       fill: { color: "EEF9FA" }, line: { color: COLORS.cyanLight, width: 0.75 },
       rectRadius: 0.08,
     });
     slide.addText(data.bingAnalysisPlataforma, {
-      x: 0.55, y: 6.05, w: 5.8, h: 1.1,
+      x: 0.55, y: 4.537, w: 5.8, h: 1.1,
       fontFace: FONT_BODY, fontSize: 10, color: COLORS.textDark,
     });
   }
 
   if (data.bingAnalysisTermos) {
     slide.addShape("roundRect", {
-      x: 6.9, y: 5.95, w: 6.0, h: 1.3,
+      x: 6.9, y: 4.463, w: 6.0, h: 1.3,
       fill: { color: "EEF9FA" }, line: { color: COLORS.cyanLight, width: 0.75 },
       rectRadius: 0.08,
     });
     slide.addText(data.bingAnalysisTermos, {
-      x: 7.05, y: 6.05, w: 5.7, h: 1.1,
+      x: 7.05, y: 4.537, w: 5.7, h: 1.1,
       fontFace: FONT_BODY, fontSize: 10, color: COLORS.textDark, bold: true,
     });
   }
@@ -811,12 +829,12 @@ function addBingShareSlide(pptx: pptxgen, data: PresentationData, logo: string |
 
   if (data.bingShareAnalysis) {
     slide.addShape("roundRect", {
-      x: 0.4, y: 6.9, w: 12.5, h: 0.45,
+      x: 0.4, y: 5.175, w: 9.375, h: 0.45,
       fill: { color: "EEF9FA" }, line: { color: COLORS.cyanLight, width: 0.5 },
       rectRadius: 0.06,
     });
     slide.addText(data.bingShareAnalysis, {
-      x: 0.55, y: 6.95, w: 12.2, h: 0.35,
+      x: 0.55, y: 5.213, w: 9.15, h: 0.35,
       fontFace: FONT_BODY, fontSize: 10, color: COLORS.textDark,
     });
   }
@@ -838,12 +856,12 @@ function addShareConcorrentesSlide(pptx: pptxgen, data: PresentationData, logo: 
   // Análise esquerda
   if (data.concorrentesAnalysis) {
     slide.addShape("roundRect", {
-      x: 0.4, y: 6.85, w: 7.8, h: 0.45,
+      x: 0.4, y: 5.137, w: 7.8, h: 0.45,
       fill: { color: "EEF9FA" }, line: { color: COLORS.cyanLight, width: 0.5 },
       rectRadius: 0.06,
     });
     slide.addText(data.concorrentesAnalysis, {
-      x: 0.55, y: 6.9, w: 7.5, h: 0.35,
+      x: 0.55, y: 5.175, w: 7.5, h: 0.35,
       fontFace: FONT_BODY, fontSize: 9, color: COLORS.textDark,
     });
   }
@@ -851,12 +869,12 @@ function addShareConcorrentesSlide(pptx: pptxgen, data: PresentationData, logo: 
   // Análise direita
   if (data.concorrentesAnalysisPizza) {
     slide.addShape("roundRect", {
-      x: 8.4, y: 6.85, w: 4.5, h: 0.45,
+      x: 8.4, y: 5.137, w: 4.5, h: 0.45,
       fill: { color: "EEF9FA" }, line: { color: COLORS.cyanLight, width: 0.5 },
       rectRadius: 0.06,
     });
     slide.addText(data.concorrentesAnalysisPizza, {
-      x: 8.55, y: 6.9, w: 4.2, h: 0.35,
+      x: 8.55, y: 5.175, w: 4.2, h: 0.35,
       fontFace: FONT_BODY, fontSize: 9, color: COLORS.textDark, bold: true,
     });
   }
@@ -878,12 +896,12 @@ function addShareWhitelistSlide(pptx: pptxgen, data: PresentationData, logo: str
   // Análise esquerda
   if (data.whitelistAnalysis) {
     slide.addShape("roundRect", {
-      x: 0.4, y: 6.85, w: 7.8, h: 0.45,
+      x: 0.4, y: 5.137, w: 7.8, h: 0.45,
       fill: { color: "EEF9FA" }, line: { color: COLORS.cyanLight, width: 0.5 },
       rectRadius: 0.06,
     });
     slide.addText(data.whitelistAnalysis, {
-      x: 0.55, y: 6.9, w: 7.5, h: 0.35,
+      x: 0.55, y: 5.175, w: 7.5, h: 0.35,
       fontFace: FONT_BODY, fontSize: 9, color: COLORS.textDark,
     });
   }
@@ -891,12 +909,12 @@ function addShareWhitelistSlide(pptx: pptxgen, data: PresentationData, logo: str
   // Análise direita
   if (data.whitelistAnalysisPizza) {
     slide.addShape("roundRect", {
-      x: 8.4, y: 6.85, w: 4.5, h: 0.45,
+      x: 8.4, y: 5.137, w: 4.5, h: 0.45,
       fill: { color: "EEF9FA" }, line: { color: COLORS.cyanLight, width: 0.5 },
       rectRadius: 0.06,
     });
     slide.addText(data.whitelistAnalysisPizza, {
-      x: 8.55, y: 6.9, w: 4.2, h: 0.35,
+      x: 8.55, y: 5.175, w: 4.2, h: 0.35,
       fontFace: FONT_BODY, fontSize: 9, color: COLORS.textDark, bold: true,
     });
   }
@@ -986,7 +1004,7 @@ function addTrademarkAprovSlide(pptx: pptxgen, data: PresentationData, logo: str
   });
 
   slide.addText("Agressores aguardando aprovação para entrarem no fluxo de denúncia.", {
-    x: 0.4, y: 1.5, w: 12.5, h: 0.4,
+    x: 0.4, y: 1.5, w: 9.375, h: 0.4,
     fontFace: FONT_BODY, fontSize: 12, color: COLORS.textDark,
   });
 
@@ -1022,7 +1040,7 @@ function addTrademarkAprovSlide(pptx: pptxgen, data: PresentationData, logo: str
 
   if (data.trademarkAprovAnalysis) {
     slide.addText(data.trademarkAprovAnalysis, {
-      x: 0.4, y: 6.5, w: 12.5, h: 0.7,
+      x: 0.4, y: 4.875, w: 9.375, h: 0.7,
       fontFace: FONT_BODY, fontSize: 11, color: COLORS.textMuted, italic: true,
     });
   }
@@ -1106,7 +1124,7 @@ function addHeatmapSlide(pptx: pptxgen, data: PresentationData, logo: string | n
   // Análise (se houver) abaixo de tudo
   if (data.heatmapAnalysis) {
     slide.addText(data.heatmapAnalysis, {
-      x: 0.5, y: 7.05, w: 12.3, h: 0.4,
+      x: 0.5, y: 5.287, w: 9.225, h: 0.4,
       fontFace: FONT_BODY, fontSize: 10, color: COLORS.blueAccent, italic: true,
     });
   }
@@ -1146,7 +1164,7 @@ function addEvolucaoSlide(pptx: pptxgen, data: PresentationData, logo: string | 
   ];
 
   slide.addTable(rows, {
-    x: 0.6, y: 1.6, w: 12,
+    x: 0.6, y: 1.6, w: 9.0,
     colW: [4.8, 2.4, 2.4, 2.4],
     border: { type: "solid", pt: 0.5, color: COLORS.border },
     autoPage: false,
@@ -1154,7 +1172,7 @@ function addEvolucaoSlide(pptx: pptxgen, data: PresentationData, logo: string | 
 
   if (data.evolucaoAnalysis) {
     slide.addText(`📌 ${data.evolucaoAnalysis}`, {
-      x: 0.6, y: 6.5, w: 12, h: 0.7,
+      x: 0.6, y: 4.875, w: 9.0, h: 0.7,
       fontFace: FONT_BODY, fontSize: 11, color: COLORS.blueAccent, italic: true,
     });
   }
@@ -1207,7 +1225,7 @@ function addTratativasSlide(pptx: pptxgen, data: PresentationData, logo: string 
   ];
 
   slide.addTable(rows, {
-    x: 0.4, y: 1.5, w: 12.5,
+    x: 0.4, y: 1.5, w: 9.375,
     colW: [1.7, 1.7, 0.8, 0.8, 1.0, 0.7, 5.8],
     border: { type: "solid", pt: 0.5, color: COLORS.border },
     autoPage: false,
@@ -1222,7 +1240,7 @@ function addTermosAtingidosSlide(pptx: pptxgen, data: PresentationData, logo: st
   addContentTitle(slide, "Tratativas em Andamento");
 
   slide.addText("Termos atingidos pelos principais agressores", {
-    x: 0.4, y: 1.4, w: 12.5, h: 0.4,
+    x: 0.4, y: 1.4, w: 9.375, h: 0.4,
     fontFace: FONT_HEADING, fontSize: 13, color: COLORS.primary,
   });
 
@@ -1248,7 +1266,7 @@ function addTermosAtingidosSlide(pptx: pptxgen, data: PresentationData, logo: st
   ];
 
   slide.addTable(rows, {
-    x: 0.6, y: 2.0, w: 12,
+    x: 0.6, y: 2.0, w: 9.0,
     colW: [4, 8],
     border: { type: "solid", pt: 0.5, color: COLORS.border },
     autoPage: false,
@@ -1334,7 +1352,7 @@ function addNegativacoesSlide(pptx: pptxgen, data: PresentationData, logo: strin
   ];
 
   slide.addTable(rows, {
-    x: 0.4, y: 1.6, w: 12.5,
+    x: 0.4, y: 1.6, w: 9.375,
     colW: [3.5, 2, 7],
     border: { type: "solid", pt: 0.5, color: COLORS.border },
     autoPage: false,
@@ -1406,14 +1424,14 @@ function addCampanhaSlide(
 
   // ─── LINHA SUPERIOR: Palavra-Chave É ───
   slide.addText(`Palavra-Chave é: "${slideData.keywordIs || "—"}"`, {
-    x: 0.4, y: 1.35, w: 12.53, h: 0.38,
+    x: 0.4, y: 1.35, w: 9.397, h: 0.38,
     fontFace: FONT_HEADING, fontSize: 12, bold: true, color: COLORS.primary, align: "center",
   });
   addChartFrame(slide, slideData.imageDataUrlIs, 0.4, 1.78, 12.53, 2.45);
 
   // ─── LINHA INFERIOR: Palavra-Chave Contém ───
   slide.addText(`Palavra-Chave contém: "${slideData.keywordContains || "—"}"`, {
-    x: 0.4, y: 4.3, w: 12.53, h: 0.38,
+    x: 0.4, y: 4.3, w: 9.397, h: 0.38,
     fontFace: FONT_HEADING, fontSize: 12, bold: true, color: COLORS.primary, align: "center",
   });
   addChartFrame(slide, slideData.imageDataUrlContains, 0.4, 4.73, 12.53, 2.45);
@@ -1421,7 +1439,7 @@ function addCampanhaSlide(
   // Análise (rodapé)
   if (slideData.analysis) {
     slide.addText(slideData.analysis, {
-      x: 0.4, y: 7.25, w: 12.5, h: 0.45,
+      x: 0.4, y: 5.438, w: 9.375, h: 0.45,
       fontFace: FONT_BODY, fontSize: 9, color: COLORS.textMuted, italic: true, align: "center",
     });
   }
@@ -1443,7 +1461,7 @@ function addSavingSlide(pptx: pptxgen, data: PresentationData, logo: string | nu
 
   // Keyword label
   slideIs.addText(`Palavra-Chave é: "${data.saving.keywordIs || "—"}"`, {
-    x: 0.6, y: 1.3, w: 12.13, h: 0.4,
+    x: 0.6, y: 1.3, w: 9.098, h: 0.4,
     fontFace: FONT_HEADING, fontSize: 12, bold: true, color: COLORS.primary, align: "center",
   });
 
@@ -1482,7 +1500,7 @@ function addSavingSlide(pptx: pptxgen, data: PresentationData, logo: string | nu
 
   if (data.saving.analysis) {
     slideIs.addText(data.saving.analysis, {
-      x: 0.4, y: 6.85, w: 12.5, h: 0.5,
+      x: 0.4, y: 5.137, w: 9.375, h: 0.5,
       fontFace: FONT_BODY, fontSize: 10, color: COLORS.textMuted, italic: true, align: "center",
     });
   }
@@ -1500,7 +1518,7 @@ function addSavingSlide(pptx: pptxgen, data: PresentationData, logo: string | nu
 
   // Keyword label
   slideContains.addText(`Palavra-Chave contém: "${data.saving.keywordContains || "—"}"`, {
-    x: 0.6, y: 1.3, w: 12.13, h: 0.4,
+    x: 0.6, y: 1.3, w: 9.098, h: 0.4,
     fontFace: FONT_HEADING, fontSize: 12, bold: true, color: COLORS.primary, align: "center",
   });
 
@@ -1539,7 +1557,7 @@ function addSavingSlide(pptx: pptxgen, data: PresentationData, logo: string | nu
 
   if (data.saving.analysis) {
     slideContains.addText(data.saving.analysis, {
-      x: 0.4, y: 6.85, w: 12.5, h: 0.5,
+      x: 0.4, y: 5.137, w: 9.375, h: 0.5,
       fontFace: FONT_BODY, fontSize: 10, color: COLORS.textMuted, italic: true, align: "center",
     });
   }
@@ -1559,7 +1577,7 @@ function addProximosPassosSlide(pptx: pptxgen, data: PresentationData, logo: str
       fontFace: FONT_HEADING, fontSize: 16, bold: true, color: COLORS.cyan,
     });
     slide.addText(step.text, {
-      x: 1.1, y: 1.7 + i * 0.7, w: 11.5, h: 0.5,
+      x: 1.1, y: 1.7 + i * 0.7, w: 8.625, h: 0.5,
       fontFace: FONT_BODY, fontSize: 13, color: COLORS.textDark,
     });
   });
@@ -1570,39 +1588,64 @@ function addProximosPassosSlide(pptx: pptxgen, data: PresentationData, logo: str
 function addEncerramentoSlide(pptx: pptxgen, coverBg: string | null, logo: string | null) {
   const slide = pptx.addSlide();
 
+  // Fundo 100% — sem borda branca
   if (coverBg) {
-    slide.addImage({ data: coverBg, x: 0, y: 0, w: 13.333, h: 7.5, sizing: { type: "cover", w: 13.333, h: 7.5 } });
+    slide.addImage({ data: coverBg, x: 0, y: 0, w: 7.5, h: 5.625, sizing: { type: "cover", w: 7.5, h: 5.625 } });
   } else {
     slide.background = { color: COLORS.primary };
   }
 
-  if (logo) slide.addImage({ data: logo, x: 0.5, y: 0.4, w: 0.5, h: 0.5 });
+  // Overlay escuro
+  slide.addShape("rect", {
+    x: 0, y: 0, w: 7.5, h: 5.625,
+    fill: { color: "000000", transparency: 33.75 },
+    line: { type: "none" },
+  });
+
+  // Logo topo
+  if (logo) slide.addImage({ data: logo, x: 0.45, y: 0.28, w: 0.5, h: 0.5 });
   slide.addText("branddi", {
-    x: 1.05, y: 0.42, w: 1.5, h: 0.4,
-    fontFace: FONT_HEADING, fontSize: 16, bold: true, color: COLORS.white,
+    x: 1.0, y: 0.3, w: 2, h: 0.38,
+    fontFace: FONT_HEADING, fontSize: 14, bold: true, color: COLORS.white,
   });
 
+  // Frase principal — Archivo Light + SemiBold (igual ao modelo)
   slide.addText("Você investe todos os dias para crescer.", {
-    x: 0.6, y: 2.5, w: 12, h: 0.8,
-    fontFace: FONT_HEADING, fontSize: 36, bold: true, color: COLORS.white,
+    x: 0.45, y: 1.3, w: 9, h: 0.8,
+    fontFace: FONT_HEADING, fontSize: 32, bold: true, color: COLORS.white,
+    wrap: true,
   });
+
+  // Frase secundária — Inter Light
   slide.addText("E a Branddi garante que esse esforço não seja desperdiçado.", {
-    x: 0.6, y: 3.4, w: 12, h: 0.8,
-    fontFace: FONT_HEADING, fontSize: 22, color: COLORS.cyanLight,
+    x: 0.45, y: 2.2, w: 9, h: 0.55,
+    fontFace: FONT_BODY, fontSize: 16, bold: false, color: COLORS.white,
+    wrap: true,
   });
 
+  // Linha divisória
+  slide.addShape("line", {
+    x: 0.45, y: 3.05, w: 5.5, h: 0,
+    line: { color: COLORS.cyanLight, width: 0.5 },
+  });
+
+  // Contato — Inter
   slide.addText("Ficou com alguma dúvida? Entre em contato!", {
-    x: 0.6, y: 5.0, w: 12, h: 0.4,
-    fontFace: FONT_BODY, fontSize: 13, color: COLORS.white, italic: true,
+    x: 0.45, y: 3.2, w: 9, h: 0.35,
+    fontFace: FONT_BODY, fontSize: 11, italic: true, color: COLORS.white,
   });
-
-  slide.addText(
-    "atendimento@branddi.com\n+55 11 92145-8912\nbranddi.com",
-    {
-      x: 0.6, y: 5.6, w: 12, h: 1.5,
-      fontFace: FONT_BODY, fontSize: 13, color: COLORS.cyanLight,
-    }
-  );
+  slide.addText("atendimento@branddi.com", {
+    x: 0.45, y: 3.65, w: 5, h: 0.3,
+    fontFace: FONT_BODY, fontSize: 12, bold: true, color: COLORS.cyanLight,
+  });
+  slide.addText("+55 11 92145-8912", {
+    x: 0.45, y: 4.0, w: 5, h: 0.28,
+    fontFace: FONT_BODY, fontSize: 11, color: COLORS.white,
+  });
+  slide.addText("branddi.com", {
+    x: 0.45, y: 4.3, w: 5, h: 0.28,
+    fontFace: FONT_BODY, fontSize: 11, color: COLORS.white,
+  });
 }
 
 // ─── Função principal ────────────────────────────────────────────────────────
@@ -1630,7 +1673,11 @@ export async function generatePresentationPpt(data: PresentationData, ativos?: P
   };
 
   const pptx = new pptxgen();
-  pptx.layout = "LAYOUT_WIDE";
+  // Layout igual ao modelo original: 10" × 5.625" (widescreen 16:9)
+  pptx.defineLayout({ name: "BRANDDI_16_9", width: 7.5, height: 5.625 });
+  pptx.layout = "BRANDDI_16_9";
+  const W = 10;      // largura do slide
+  const H = 5.625;   // altura do slide
   pptx.title = `Status Mensal - ${data.clientName}`;
   pptx.company = "Branddi";
 
